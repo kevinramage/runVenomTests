@@ -10,6 +10,7 @@ async function main() {
 	try {
 
 		// Get variables
+		const workingDirectory = core.getInput("workingDirectory");
 		const artifactName = core.getInput("artifactName");
 		const venomRelease = core.getInput("venom_release");
 		const venomPath = core.getInput("venom_path");
@@ -25,16 +26,24 @@ async function main() {
 		await exec.exec("chmod +x venom");
 
 		// Move venom binary
-		await io.mv("venom", "src/venom");
-		await exec.exec("ls src");
+		if ( workingDirectory != "" && workingDirectory != ".") {
+			await io.mv("venom", path.join(workingDirectory, "venom"));
+		}
 
 		// Build the venom command line
 		console.info("Run venom command");
 		var cmdLine = util.format("./venom run --parallel %d --output-dir %s %s", venomParallel, venomOutputDirectory, venomPath);
-		await exec.exec(cmdLine, "", { cwd: "src"});
+		if ( workingDirectory != "" && workingDirectory != "." ) {
+			await exec.exec(cmdLine, "", { cwd: workingDirectory});
+		} else {
+			await exec.exec(cmdLine, "");
+		}
 
 		// Identify artifact name
 		var artifactPath = "test_results.xml";
+		if ( workingDirectory != "" && workingDirectory != "." ) {
+			artifactPath = path.join(workingDirectory, artifactPath);
+		}
 
 		// Artifact the result
 		console.info("Artifact result");

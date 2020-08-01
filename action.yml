@@ -1,6 +1,9 @@
 name: 'run Venom'
 description: ''
 inputs:
+  workingDirectory:
+    description: "The working directory of your application"
+    default: ""
   artifactName:
     description: "The name of artifact, if empty the system will not artifact the venom results"
     default: ""
