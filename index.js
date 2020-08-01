@@ -63,9 +63,10 @@ async function main() {
 			if ( workingDirectory != "" && workingDirectory != ".") {
 				const rootDirectory = path.join(currentDirectory, workingDirectory);
 				console.info("Root directory: " + rootDirectory);
-				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], rootDirectory);
+				const file = path.join(rootDirectory, "test_results.xml");
+				await artifact.create().uploadArtifact("coucou", [file], rootDirectory);
 			} else {
-				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], currentDirectory);
+				await artifact.create().uploadArtifact("coucou", ["test_results.xml"], currentDirectory);
 			}
 		}
 
