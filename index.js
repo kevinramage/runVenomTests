@@ -4,6 +4,7 @@ const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
 const exec = require('@actions/exec');
 const artifact = require("@actions/artifact");
+const io = require("@actions/io");
 
 async function main() {
 	try {
@@ -18,24 +19,23 @@ async function main() {
 
 		// Download venom
 		console.info("Download venom");
-		if ( workspace != "" && workspace != ".") {
-			await tc.downloadTool(venomRelease, "venom");
-		} else {
-			await tc.downloadTool(venomRelease, path.join(workspace, "venom"));
-		}    
+		await tc.downloadTool(venomRelease, "venom");
+		
+		// Move venom binary
+		if ( workspace != "" && workspace != "." ) {
+			console.info("Move venom binary");
+			await exec.exec("ls -la");
+			await exec.exec("pwd");
+			await io.mv("venom", Path.join(workspace, "venom"));
+		}
 
 		// Add right to venom binary
 		console.info("Add right to venom binary");
-		await exec.exec("ls -la");
-		await exec.exec("pwd");
 		await exec.exec("chmod +x venom");
 
 		// Build the venom command line
 		console.info("Run venom command");
 		var cmdLine = util.format("./venom run --parallel %d --output-dir %s %s", venomParallel, venomOutputDirectory, venomPath);
-		if ( workspace != "" && workspace != "." ) {
-			cmdLine = util.format("cd %s;%s", workspace, cmdLine);
-		}
 		await exec.exec(cmdLine);
 
 		// Identify artifact name
