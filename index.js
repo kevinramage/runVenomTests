@@ -54,10 +54,14 @@ async function main() {
 		// Artifact the result
 		console.info("Artifact results");
 		if ( artifactName != "" ) {
+			const currentDirectory = process.cwd();
+			console.info("Current directory: " + currentDirectory);
 			if ( workingDirectory != "" && workingDirectory != ".") {
-				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], "")
+				const rootDirectory = path.join(currentDirectory, workingDirectory);
+				console.info("Root directory: " + rootDirectory);
+				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], rootDirectory);
 			} else {
-				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], "")
+				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], currentDirectory);
 			}
 		}
 
