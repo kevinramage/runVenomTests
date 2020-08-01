@@ -35,7 +35,6 @@ async function main() {
 		var cmdLine = util.format("./venom run --parallel %d --output-dir %s %s", venomParallel, venomOutputDirectory, venomPath);
 		if ( workingDirectory != "" && workingDirectory != "." ) {
 			await exec.exec(cmdLine, "", { cwd: workingDirectory});
-			console.info("End of venom command");
 		} else {
 			await exec.exec(cmdLine, "");
 		}
@@ -51,7 +50,11 @@ async function main() {
 		// Artifact the result
 		console.info("Artifact results");
 		if ( artifactName != "" ) {
-			artifact.create().uploadArtifact(artifactName, [artifactPath])
+			if ( workingDirectory != "" && workingDirectory != ".") {
+				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], workingDirectory)
+			} else {
+				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], "")
+			}
 		}
 
 		// Change the status of the job
