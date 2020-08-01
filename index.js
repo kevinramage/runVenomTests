@@ -35,18 +35,21 @@ async function main() {
 		var cmdLine = util.format("./venom run --parallel %d --output-dir %s %s", venomParallel, venomOutputDirectory, venomPath);
 		if ( workingDirectory != "" && workingDirectory != "." ) {
 			await exec.exec(cmdLine, "", { cwd: workingDirectory});
+			console.info("End of venom command");
 		} else {
 			await exec.exec(cmdLine, "");
 		}
 
 		// Identify artifact name
+		console.info("Identify artifact name");
 		var artifactPath = "test_results.xml";
 		if ( workingDirectory != "" && workingDirectory != "." ) {
 			artifactPath = path.join(workingDirectory, artifactPath);
 		}
+		console.info("- Artifact path: " + artifactPath);
 
 		// Artifact the result
-		console.info("Artifact result");
+		console.info("Artifact results");
 		if ( artifactName != "" ) {
 			artifact.create().uploadArtifact(artifactName, [artifactPath])
 		}
