@@ -21,6 +21,8 @@ async function main() {
 		const venomVars = core.getInput("venom_variable");
 		const venomExclude = core.getInput("venom_exclude");
 		const venomFormat = core.getInput("venom_format");
+		const venomStopOnFailure = core.getInput("venomStopOnFailure");
+		const venomStrict = core.getInput("venomStrict");
 
 		// Download venom
 		console.info("Download venom");
@@ -46,6 +48,12 @@ async function main() {
 		}
 		if ( venomExclude != "" ) {
 			cmdLine = util.format("%s --exclude %s", cmdLine, venomExclude);
+		}
+		if ( venomStopOnFailure == "true" ) {
+			cmdLine = util.format("%s --stop-on-failure", cmdLine);
+		}
+		if ( venomStrict == "true" ) {
+			cmdLine = util.format("%s --strict", cmdLine);
 		}
 		cmdLine = util.format("%s --format %s %s", cmdLine, venomFormat, venomPath);
 		if ( workingDirectory != "" && workingDirectory != "." ) {

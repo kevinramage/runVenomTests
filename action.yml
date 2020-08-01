@@ -34,6 +34,11 @@ inputs:
   venom_format:
     description: "Venom format: yaml, json, xml, tap"
     default: xml
+  venomStopOnFailure:
+    description: "Flag to indicate to venom to stop test suite when a test case fail"
+    default: false
+  venomStrict:
+    description: "Flag to indicate to venom to exit when a test fail"
 
   
 outputs:
