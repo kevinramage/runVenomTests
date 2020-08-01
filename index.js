@@ -6,93 +6,118 @@ const exec = require('@actions/exec');
 const artifact = require("@actions/artifact");
 const io = require("@actions/io");
 
-async function main() {
-	try {
+class VenomRunner {
 
-		// Get variables
-		const workingDirectory = core.getInput("workingDirectory");
-		const artifactName = core.getInput("artifactName");
-		const venomRelease = core.getInput("venom_release");
-		const venomPath = core.getInput("venom_path");
-		const venomParallel = core.getInput("venom_parallel");
-		const venomOutputDirectory = core.getInput("venom_outputdir");
-		const venomLogLevel = core.getInput("venom_log");
-		const venomEnvVars = core.getInput("venom_environment");
-		const venomVars = core.getInput("venom_variable");
-		const venomExclude = core.getInput("venom_exclude");
-		const venomFormat = core.getInput("venom_format");
-		const venomStopOnFailure = core.getInput("venomStopOnFailure");
-		const venomStrict = core.getInput("venomStrict");
+	init() {
+		this.workingDirectory = core.getInput("workingDirectory");
+		this.artifactName = core.getInput("artifactName");
+		this.venomRelease = core.getInput("venom_release");
+		this.venomPath = core.getInput("venom_path");
+		this.venomParallel = core.getInput("venom_parallel");
+		this.venomOutputDirectory = core.getInput("venom_outputdir");
+		this.venomLogLevel = core.getInput("venom_log");
+		this.venomEnvVars = core.getInput("venom_environment");
+		this.venomVars = core.getInput("venom_variable");
+		this.venomExclude = core.getInput("venom_exclude");
+		this.venomFormat = core.getInput("venom_format");
+		this.venomStopOnFailure = core.getInput("venomStopOnFailure");
+		this.venomStrict = core.getInput("venomStrict");
+	}
 
-		// Download venom
+	async downloadVenom() {
 		console.info("Download venom");
-		await tc.downloadTool(venomRelease, "venom");
-
-		// Add right to venom binary
-		console.info("Add right to venom binary");
+		await tc.downloadTool(this.venomRelease, "venom");
 		await exec.exec("chmod +x venom");
-
-		// Move venom binary
-		if ( workingDirectory != "" && workingDirectory != ".") {
-			await io.mv("venom", path.join(workingDirectory, "venom"));
+		if ( this.workingDirectory != "" && this.workingDirectory != ".") {
+			await io.mv("venom", path.join(this.workingDirectory, "venom"));
 		}
+	}
 
-		// Build the venom command line
+	async executeVenom() {
 		console.info("Run venom command");
-		var cmdLine = util.format("./venom run --parallel %d --output-dir %s --log %s", venomParallel, venomOutputDirectory, venomLogLevel);
-		if ( venomEnvVars != "" ) {
-			cmdLine = util.format("%s --env %s", cmdLine, venomEnvVars);
-		}
-		if ( venomVars != "" ) {
-			cmdLine = util.format("%s --var %s", cmdLine, venomVars);
-		}
-		if ( venomExclude != "" ) {
-			cmdLine = util.format("%s --exclude %s", cmdLine, venomExclude);
-		}
-		if ( venomStopOnFailure == "true" ) {
-			cmdLine = util.format("%s --stop-on-failure", cmdLine);
-		}
-		if ( venomStrict == "true" ) {
-			cmdLine = util.format("%s --strict", cmdLine);
-		}
-		cmdLine = util.format("%s --format %s %s", cmdLine, venomFormat, venomPath);
+		const cmdLine = this.generateVenomCmdLine();
+
 		if ( workingDirectory != "" && workingDirectory != "." ) {
 			await exec.exec(cmdLine, "", { cwd: workingDirectory});
 		} else {
 			await exec.exec(cmdLine, "");
 		}
+	}
 
-		// Artifact the result
+	generateVenomCmdLine() {
+		var cmdLine = util.format("./venom run --parallel %d --output-dir %s --log %s", this.venomParallel, this.venomOutputDirectory, this.venomLogLevel);
+
+		if ( this.venomEnvVars != "" ) {
+			cmdLine = util.format("%s --env %s", cmdLine, this.venomEnvVars);
+		}
+		if ( this.venomVars != "" ) {
+			cmdLine = util.format("%s --var %s", cmdLine, this.venomVars);
+		}
+		if ( this.venomExclude != "" ) {
+			cmdLine = util.format("%s --exclude %s", cmdLine, this.venomExclude);
+		}
+		if ( this.venomStopOnFailure == "true" ) {
+			cmdLine = util.format("%s --stop-on-failure", cmdLine);
+		}
+		if ( this.venomStrict == "true" ) {
+			cmdLine = util.format("%s --strict", cmdLine);
+		}
+		cmdLine = util.format("%s --format %s %s", cmdLine, this.venomFormat, this.venomPath);
+
+		return cmdLine;
+	}
+
+	async artifactResults() {
 		console.info("Artifact results");
-		if ( artifactName != "" ) {
+		if ( this.artifactName != "" ) {
 			const currentDirectory = process.cwd();
-			if ( workingDirectory != "" && workingDirectory != ".") {
-				const rootDirectory = path.join(currentDirectory, workingDirectory);
+			if ( this.workingDirectory != "" && this.workingDirectory != ".") {
+				const rootDirectory = path.join(currentDirectory, this.workingDirectory);
 				const file = path.join(rootDirectory, "test_results.xml");
-				await artifact.create().uploadArtifact(artifactName, [file], rootDirectory);
+				await artifact.create().uploadArtifact(this.artifactName, [file], rootDirectory);
 			} else {
 				const file = path.join(currentDirectory, "test_results.xml");
-				await artifact.create().uploadArtifact(artifactName, [file], currentDirectory);
+				await artifact.create().uploadArtifact(this.artifactName, [file], currentDirectory);
 			}
 		}
+	}
 
-		// Change the status of the job
+	async changeStatus() {
 		console.info("Change status");
-		await exec.exec("cat test_results.xml", "", { cwd: workingDirectory });
-		const statusCommandLine = util.format("cat %s | grep \"<failure>\"", "test_results.xml");
-		var returnCode;
+		
+		// Prepare listener
+		var output = "";
+		const options = {};
+		options.listeners = {
+		  stdout: (data) => {
+			output += data.toString();
+		  }
+		};
+
+		// Get the result
 		if ( workingDirectory != "" && workingDirectory != "." ) {
-			returnCode = await exec.exec(statusCommandLine, "", { cwd: workingDirectory});
+			await exec.exec("cat test_results.xml", "", { cwd: workingDirectory});
 		} else {
-			returnCode = await exec.exec(statusCommandLine, "");
+			await exec.exec("cat test_results.xml", "");
 		}
-		if ( returnCode != 0 ) {
+
+		// Check the presence of failure tag
+		if ( output.includes("<failure>") ) {
 			core.setFailed("Tests failed")
 		}
+	}
 
-	} catch (error) {
-		core.setFailed(error.message);
+	async execute() {
+		try {
+			this.init();
+			await this.downloadVenom();
+			await this.executeVenom();
+			await this.artifactResults();
+			await this.changeStatus();
+		} catch (error) {
+			core.setFailed(error.message);
+		}
 	}
 }
 
-main();
+new VenomRunner().execute();
