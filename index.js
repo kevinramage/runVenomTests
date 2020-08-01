@@ -5,56 +5,60 @@ const tc = require('@actions/tool-cache');
 const exec = require('@actions/exec');
 const artifact = require("@actions/artifact");
 
-try {
+async function main() {
+	try {
 
-    // Get variables
-    const workspace = core.getInput("workspace");
-    const artifactName = core.getInput("artifactName");
-    const venomRelease = core.getInput("venom_release");
-    const venomPath = core.getInput("venom_path");
-    const venomParallel = core.getInput("venom_parallel");
-    const venomOutputDirectory = core.getInput("venom_outputdir");
+		// Get variables
+		const workspace = core.getInput("workspace");
+		const artifactName = core.getInput("artifactName");
+		const venomRelease = core.getInput("venom_release");
+		const venomPath = core.getInput("venom_path");
+		const venomParallel = core.getInput("venom_parallel");
+		const venomOutputDirectory = core.getInput("venom_outputdir");
 
-    // Download venom
-    console.info("Download venom");
-    if ( workspace != "" && workspace != ".") {
-        await tc.downloadTool(venomRelease, "venom");
-    } else {
-        await tc.downloadTool(venomRelease, path.join(workspace, "venom"));
-    }    
+		// Download venom
+		console.info("Download venom");
+		if ( workspace != "" && workspace != ".") {
+			await tc.downloadTool(venomRelease, "venom");
+		} else {
+			await tc.downloadTool(venomRelease, path.join(workspace, "venom"));
+		}    
 
-    // Add right to venom binary
-    console.info("Add right to venom binary");
-    await exec.exec("chmod +x venom");
+		// Add right to venom binary
+		console.info("Add right to venom binary");
+		await exec.exec("chmod +x venom");
 
-    // Build the venom command line
-    console.info("Run venom command");
-    var cmdLine = util.format("./venom run --parallel %d --output-dir %s %s", venomParallel, venomOutputDirectory, venomPath);
-    if ( workspace != "" && workspace != "." ) {
-        cmdLine = util.format("cd %s;%s", workspace, cmdLine);
-    }
-    await exec.exec(cmdLine);
+		// Build the venom command line
+		console.info("Run venom command");
+		var cmdLine = util.format("./venom run --parallel %d --output-dir %s %s", venomParallel, venomOutputDirectory, venomPath);
+		if ( workspace != "" && workspace != "." ) {
+			cmdLine = util.format("cd %s;%s", workspace, cmdLine);
+		}
+		await exec.exec(cmdLine);
 
-    // Identify artifact name
-    var artifactPath = "test_results.xml";
-    if ( workspace != "" && workspace != "." ) {
-        artifactPath = path.join(workspace, artifactPath);
-    }
+		// Identify artifact name
+		var artifactPath = "test_results.xml";
+		if ( workspace != "" && workspace != "." ) {
+			artifactPath = path.join(workspace, artifactPath);
+		}
 
-    // Artifact the result
-    console.info("Artifact result");
-    if ( artifactName != "" ) {
-        artifact.create().uploadArtifact(artifactName, [artifactPath])
-    }
+		// Artifact the result
+		console.info("Artifact result");
+		if ( artifactName != "" ) {
+			artifact.create().uploadArtifact(artifactName, [artifactPath])
+		}
 
-    // Change the status of the job
-    console.info("Change status");
-    const statusCommandLine = util.format("cat %s | grep \"<failure>\" | wc -l", artifactPath);
-    const returnCode = await exec.exec(statusCommandLine);
-    if ( returnCode != 0 ) {
-        core.setFailed("Tests failed")
-    }
+		// Change the status of the job
+		console.info("Change status");
+		const statusCommandLine = util.format("cat %s | grep \"<failure>\" | wc -l", artifactPath);
+		const returnCode = await exec.exec(statusCommandLine);
+		if ( returnCode != 0 ) {
+			core.setFailed("Tests failed")
+		}
 
-} catch (error) {
-    core.setFailed(error.message);
+	} catch (error) {
+		core.setFailed(error.message);
+	}
 }
+
+main();
