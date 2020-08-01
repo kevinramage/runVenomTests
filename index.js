@@ -31,9 +31,6 @@ async function main() {
 
 		// Identify artifact name
 		var artifactPath = "test_results.xml";
-		if ( workspace != "" && workspace != "." ) {
-			artifactPath = path.join(workspace, artifactPath);
-		}
 
 		// Artifact the result
 		console.info("Artifact result");
