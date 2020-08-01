@@ -20,13 +20,13 @@ async function main() {
 		console.info("Download venom");
 		await tc.downloadTool(venomRelease, "venom");
 
-		// Move venom binary
-		await io.mv("venom", "src/venom");
-		await exec.exec("ls src");
-
 		// Add right to venom binary
 		console.info("Add right to venom binary");
 		await exec.exec("chmod +x venom");
+
+		// Move venom binary
+		await io.mv("venom", "src/venom");
+		await exec.exec("ls src");
 
 		// Build the venom command line
 		console.info("Run venom command");
