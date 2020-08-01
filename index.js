@@ -54,14 +54,6 @@ async function main() {
 			await exec.exec(cmdLine, "");
 		}
 
-		// Identify artifact name
-		console.info("Identify artifact name");
-		var artifactPath = "test_results.xml";
-		if ( workingDirectory != "" && workingDirectory != "." ) {
-			artifactPath = path.join(workingDirectory, artifactPath);
-		}
-		console.info("- Artifact path: " + artifactPath);
-
 		// Artifact the result
 		console.info("Artifact results");
 		if ( artifactName != "" ) {
@@ -79,7 +71,7 @@ async function main() {
 		// Change the status of the job
 		console.info("Change status");
 		await exec.exec("cat test_results.xml", "", { cwd: workingDirectory });
-		const statusCommandLine = util.format("cat %s | grep \"<failure>\" | wc -l", "test_results.xml");
+		const statusCommandLine = util.format("cat %s | grep \"<failure>\"", "test_results.xml");
 		var returnCode;
 		if ( workingDirectory != "" && workingDirectory != "." ) {
 			returnCode = await exec.exec(statusCommandLine, "", { cwd: workingDirectory});
