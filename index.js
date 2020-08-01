@@ -26,6 +26,8 @@ async function main() {
 
 		// Add right to venom binary
 		console.info("Add right to venom binary");
+		await exec.exec("ls -la");
+		await exec.exec("pwd");
 		await exec.exec("chmod +x venom");
 
 		// Build the venom command line
