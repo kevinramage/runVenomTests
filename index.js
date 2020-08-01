@@ -16,6 +16,11 @@ async function main() {
 		const venomParallel = core.getInput("venom_parallel");
 		const venomOutputDirectory = core.getInput("venom_outputdir");
 
+		// Change workdir
+		await exec.exec("pwd");
+		await exec.exec("cd src");
+		await exec.exec("pwd");
+
 		// Download venom
 		console.info("Download venom");
 		await tc.downloadTool(venomRelease, "venom");
