@@ -62,10 +62,6 @@ async function main() {
 		}
 		console.info("- Artifact path: " + artifactPath);
 
-		// ls
-		await exec.exec("ls -la");
-		await exec.exec("ls -la src");
-
 		// Artifact the result
 		console.info("Artifact results");
 		if ( artifactName != "" ) {
