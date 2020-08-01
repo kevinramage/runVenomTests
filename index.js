@@ -16,15 +16,13 @@ async function main() {
 		const venomParallel = core.getInput("venom_parallel");
 		const venomOutputDirectory = core.getInput("venom_outputdir");
 
-		// Change workdir
-		await exec.exec("pwd");
-		await exec.exec("ls -la");
-		await exec.exec("cd ./src");
-		await exec.exec("pwd");
-
 		// Download venom
 		console.info("Download venom");
 		await tc.downloadTool(venomRelease, "venom");
+
+		// Move venom binary
+		await io.mv("venom", "src/venom");
+		await exec.exec("ls src");
 
 		// Add right to venom binary
 		console.info("Add right to venom binary");
@@ -33,7 +31,7 @@ async function main() {
 		// Build the venom command line
 		console.info("Run venom command");
 		var cmdLine = util.format("./venom run --parallel %d --output-dir %s %s", venomParallel, venomOutputDirectory, venomPath);
-		await exec.exec(cmdLine);
+		await exec.exec(cmdLine, "", { cwd: "src"});
 
 		// Identify artifact name
 		var artifactPath = "test_results.xml";
