@@ -26,7 +26,7 @@ async function main() {
 			console.info("Move venom binary");
 			await exec.exec("ls -la");
 			await exec.exec("pwd");
-			await io.mv("venom", Path.join(workspace, "venom"));
+			await io.mv("venom", path.join(workspace, "venom"));
 		}
 
 		// Add right to venom binary
