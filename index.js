@@ -17,6 +17,8 @@ async function main() {
 		const venomParallel = core.getInput("venom_parallel");
 		const venomOutputDirectory = core.getInput("venom_outputdir");
 		const venomLogLevel = core.getInput("venom_log");
+		const venomEnvVars = core.getInput("venom_environment");
+		const venomVars = core.getInput("venom_variable");
 
 		// Download venom
 		console.info("Download venom");
@@ -33,7 +35,8 @@ async function main() {
 
 		// Build the venom command line
 		console.info("Run venom command");
-		var cmdLine = util.format("./venom run --parallel %d --output-dir %s --log %s %s", venomParallel, venomOutputDirectory, venomLogLevel, venomPath);
+		var cmdLine = util.format("./venom run --parallel %d --output-dir %s --log %s --env %s", venomParallel, venomOutputDirectory, venomLogLevel, venomEnvVars);
+		cmdLine = util.format("%s --var %s %s", cmdLine, venomVars, venomPath);
 		if ( workingDirectory != "" && workingDirectory != "." ) {
 			await exec.exec(cmdLine, "", { cwd: workingDirectory});
 		} else {
