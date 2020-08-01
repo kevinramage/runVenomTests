@@ -18,7 +18,8 @@ async function main() {
 
 		// Change workdir
 		await exec.exec("pwd");
-		await exec.exec("cd src");
+		await exec.exec("ls -la");
+		await exec.exec("cd ./src");
 		await exec.exec("pwd");
 
 		// Download venom
