@@ -35,8 +35,14 @@ async function main() {
 
 		// Build the venom command line
 		console.info("Run venom command");
-		var cmdLine = util.format("./venom run --parallel %d --output-dir %s --log %s --env %s", venomParallel, venomOutputDirectory, venomLogLevel, venomEnvVars);
-		cmdLine = util.format("%s --var %s %s", cmdLine, venomVars, venomPath);
+		var cmdLine = util.format("./venom run --parallel %d --output-dir %s --log %s", venomParallel, venomOutputDirectory, venomLogLevel);
+		if ( venomEnvVars != "" ) {
+			cmdLine = util.format("%s --env %s", cmdLine, venomEnvVars);
+		}
+		if ( venomVars != "" ) {
+			cmdLine = util.format("%s --var %s", cmdLine, venomVars);
+		}
+		cmdLine = util.format("%s %s", cmdLine, venomPath);
 		if ( workingDirectory != "" && workingDirectory != "." ) {
 			await exec.exec(cmdLine, "", { cwd: workingDirectory});
 		} else {
