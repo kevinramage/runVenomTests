@@ -21,12 +21,15 @@ async function main() {
 		console.info("Download venom");
 		await tc.downloadTool(venomRelease, "venom");
 		
-		// Move venom binary
+		// Change workspace
 		if ( workspace != "" && workspace != "." ) {
-			console.info("Move venom binary");
+			console.info("Change workspace");
 			await exec.exec("ls -la");
 			await exec.exec("pwd");
 			await io.mv("venom", path.join(workspace, "venom"));
+			await exec.exec(util.format("cd %s", workspace));
+			await exec.exec("ls -la");
+			await exec.exec("pwd");
 		}
 
 		// Add right to venom binary
