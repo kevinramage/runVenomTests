@@ -19,6 +19,8 @@ async function main() {
 		const venomLogLevel = core.getInput("venom_log");
 		const venomEnvVars = core.getInput("venom_environment");
 		const venomVars = core.getInput("venom_variable");
+		const venomExclude = core.getInput("venom_exclude");
+		const venomFormat = core.getInput("venom_format");
 
 		// Download venom
 		console.info("Download venom");
@@ -42,7 +44,10 @@ async function main() {
 		if ( venomVars != "" ) {
 			cmdLine = util.format("%s --var %s", cmdLine, venomVars);
 		}
-		cmdLine = util.format("%s %s", cmdLine, venomPath);
+		if ( venomExclude != "" ) {
+			cmdLine = util.format("%s --exclude %s", cmdLine, venomExclude);
+		}
+		cmdLine = util.format("%s --format %s %s", cmdLine, venomFormat, venomPath);
 		if ( workingDirectory != "" && workingDirectory != "." ) {
 			await exec.exec(cmdLine, "", { cwd: workingDirectory});
 		} else {
@@ -65,21 +70,26 @@ async function main() {
 		console.info("Artifact results");
 		if ( artifactName != "" ) {
 			const currentDirectory = process.cwd();
-			console.info("Current directory: " + currentDirectory);
 			if ( workingDirectory != "" && workingDirectory != ".") {
 				const rootDirectory = path.join(currentDirectory, workingDirectory);
-				console.info("Root directory: " + rootDirectory);
 				const file = path.join(rootDirectory, "test_results.xml");
-				await artifact.create().uploadArtifact("coucou", [file], rootDirectory);
+				await artifact.create().uploadArtifact(artifactName, [file], rootDirectory);
 			} else {
-				await artifact.create().uploadArtifact("coucou", ["test_results.xml"], currentDirectory);
+				const file = path.join(currentDirectory, "test_results.xml");
+				await artifact.create().uploadArtifact(artifactName, [file], currentDirectory);
 			}
 		}
 
 		// Change the status of the job
 		console.info("Change status");
-		const statusCommandLine = util.format("cat %s | grep \"<failure>\" | wc -l", artifactPath);
-		const returnCode = await exec.exec(statusCommandLine);
+		await exec.exec("cat test_results.xml", "", { cwd: workingDirectory });
+		const statusCommandLine = util.format("cat %s | grep \"<failure>\" | wc -l", "test_results.xml");
+		var returnCode;
+		if ( workingDirectory != "" && workingDirectory != "." ) {
+			returnCode = await exec.exec(statusCommandLine, "", { cwd: workingDirectory});
+		} else {
+			returnCode = await exec.exec(statusCommandLine, "");
+		}
 		if ( returnCode != 0 ) {
 			core.setFailed("Tests failed")
 		}

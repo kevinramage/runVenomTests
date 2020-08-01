@@ -28,6 +28,12 @@ inputs:
   venom_variable:
     description: "Venom variables"
     default: ""
+  venom_exclude:
+    description: "Exclude some tests"
+    default: ""
+  venom_format:
+    description: "Venom format: yaml, json, xml, tap"
+    default: xml
 
   
 outputs:
