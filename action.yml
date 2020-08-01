@@ -1,0 +1,26 @@
+name: 'run Venom'
+description: ''
+inputs:
+  workspace:
+    descripton: "Workspace directory"
+    default: ""
+  artifactName:
+    description: "The name of artifact, if empty the system will not artifact the venom results"
+    default: ""
+  venom_release:
+    description: "The url of venom release"
+    default: https://github.com/ovh/venom/releases/download/v0.27.0/venom.linux-amd64
+  venom_path:
+    desciption: "The path of venom test to execute"
+    required: true
+  venom_parallel:
+    description: "Number of test to execute in parallel"
+    default: 1
+  venom_outputdir:
+    description: "Output directory to store results"
+    default: "."
+  
+outputs:
+runs:
+  using: 'node12'
+  main: 'index.js'
