@@ -1,5 +1,5 @@
 {
-  "name": "runVenomTests",
+  "name": "runvenomtests",
   "version": "1.0.0",
   "description": "Github action to run venom tests",
   "main": "index.js",

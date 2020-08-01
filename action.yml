@@ -1,9 +1,6 @@
 name: 'run Venom'
 description: ''
 inputs:
-  workspace:
-    descripton: "Workspace directory"
-    default: ""
   artifactName:
     description: "The name of artifact, if empty the system will not artifact the venom results"
     default: ""

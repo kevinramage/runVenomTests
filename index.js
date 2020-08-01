@@ -10,7 +10,6 @@ async function main() {
 	try {
 
 		// Get variables
-		const workspace = core.getInput("workspace");
 		const artifactName = core.getInput("artifactName");
 		const venomRelease = core.getInput("venom_release");
 		const venomPath = core.getInput("venom_path");
@@ -20,17 +19,6 @@ async function main() {
 		// Download venom
 		console.info("Download venom");
 		await tc.downloadTool(venomRelease, "venom");
-		
-		// Change workspace
-		if ( workspace != "" && workspace != "." ) {
-			console.info("Change workspace");
-			await exec.exec("ls -la");
-			await exec.exec("pwd");
-			await io.mv("venom", path.join(workspace, "venom"));
-			await exec.exec(util.format("cd %s", workspace));
-			await exec.exec("ls -la");
-			await exec.exec("pwd");
-		}
 
 		// Add right to venom binary
 		console.info("Add right to venom binary");
