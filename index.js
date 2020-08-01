@@ -47,11 +47,15 @@ async function main() {
 		}
 		console.info("- Artifact path: " + artifactPath);
 
+		// ls
+		await exec.exec("ls -la");
+		await exec.exec("ls -la src");
+
 		// Artifact the result
 		console.info("Artifact results");
 		if ( artifactName != "" ) {
 			if ( workingDirectory != "" && workingDirectory != ".") {
-				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], workingDirectory)
+				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], "")
 			} else {
 				await artifact.create().uploadArtifact(artifactName, ["test_results.xml"], "")
 			}
