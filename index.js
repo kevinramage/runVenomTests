@@ -37,8 +37,8 @@ class VenomRunner {
 		console.info("Run venom command");
 		const cmdLine = this.generateVenomCmdLine();
 
-		if ( workingDirectory != "" && workingDirectory != "." ) {
-			await exec.exec(cmdLine, "", { cwd: workingDirectory});
+		if ( this.workingDirectory != "" && this.workingDirectory != "." ) {
+			await exec.exec(cmdLine, "", { cwd: this.workingDirectory});
 		} else {
 			await exec.exec(cmdLine, "");
 		}
@@ -95,8 +95,8 @@ class VenomRunner {
 		};
 
 		// Get the result
-		if ( workingDirectory != "" && workingDirectory != "." ) {
-			await exec.exec("cat test_results.xml", "", { cwd: workingDirectory});
+		if ( this.workingDirectory != "" && this.workingDirectory != "." ) {
+			await exec.exec("cat test_results.xml", "", { cwd: this.workingDirectory});
 		} else {
 			await exec.exec("cat test_results.xml", "");
 		}
