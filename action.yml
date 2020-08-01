@@ -19,6 +19,9 @@ inputs:
   venom_outputdir:
     description: "Output directory to store results"
     default: "."
+  venom_log:
+    description: "Venom logging level"
+    default: warn
   
 outputs:
 runs:
