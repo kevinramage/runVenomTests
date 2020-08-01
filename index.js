@@ -4,6 +4,7 @@ const core = require('@actions/core');
 const tc = require('@actions/tool-cache');
 const exec = require('@actions/exec');
 const artifact = require("@actions/artifact");
+const fs = require("fs");
 const io = require("@actions/io");
 
 class VenomRunner {
@@ -84,7 +85,18 @@ class VenomRunner {
 
 	async changeStatus() {
 		console.info("Change status");
+
+		// Read file
+		var filePath;
+		if ( this.workingDirectory != "" && this.workingDirectory != "." ) {
+			filePath = path.join(this.workingDirectory, "test_results.xml");
+		} else {
+			filePath = "test_results.xml";
+		}
+		const buffer = fs.readFileSync(filePath);
+		const output = buffer.toString();
 		
+		/*
 		// Prepare listener
 		var output = "";
 		const options = {};
@@ -100,6 +112,7 @@ class VenomRunner {
 		} else {
 			await exec.exec("cat test_results.xml", "");
 		}
+		*/
 
 		// Check the presence of failure tag
 		if ( output.includes("<failure>") ) {
