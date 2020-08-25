@@ -39,9 +39,6 @@ inputs:
     default: false
   venomStrict:
     description: "Flag to indicate to venom to exit when a test fail"
-
-  
-outputs:
 runs:
   using: 'node12'
   main: 'index.js'
